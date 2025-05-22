@@ -2,6 +2,7 @@
 
 import streamlit as st
 import pandas as pd
+import streamlit.components.v1 as components
 
 # *********Initialization dataframe************
 
@@ -112,3 +113,11 @@ for i in range(0, len(image_urls), images_per_row):
                     f"{df[df['Poster'] == '/'+ image.split('/')[-1]]['tconst'].iloc[0]}"
                 )
 # ****************Movie details*****************************
+if "selected_movie" in st.session_state:
+    movie = df[df["tconst"] == st.session_state["selected_movie"]].iloc[0]
+
+    modal_html = f"""
+
+        """
+
+    components.html(modal_html, height=600, width=800)
