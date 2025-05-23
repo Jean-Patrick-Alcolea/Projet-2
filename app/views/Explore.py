@@ -4,11 +4,14 @@ import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
 
-# *********Initialization dataframe************
+query_params = st.query_params
 
 
 def initialize():
     return pd.read_parquet("data/app_df.gzip")
+
+
+# *********Initialization dataframe************
 
 
 if "df" not in st.session_state:
@@ -17,14 +20,42 @@ if "df" not in st.session_state:
 else:
     df = st.session_state["df"]
 
+# ****************Movie details*****************************
+
+if query_params.get("page") == "detail":
+    tconst = query_params.get("tconst")
+    info_film = df[df["tconst"] == tconst]
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(f"https://image.tmdb.org/t/p/w300/{info_film['Poster'].iloc[0]}")
+    with col2:
+        st.markdown(f"**Titre :** {info_film['Title'].iloc[0]}")
+        st.markdown(f"**Realisateur :** {info_film['Director'].iloc[0]}")
+        st.markdown(f"**Note :** {info_film['Rating'].iloc[0]}")
+        st.markdown(f"**Année :** {info_film['Year'].iloc[0]}")
+        st.write(f"{info_film['Resume'].iloc[0]}")
+        st.markdown(f"**Genres :** {info_film['Genres'].iloc[0]}")
+        st.markdown(f"**Acteurs :** {info_film['Actors'].iloc[0]}")
+    col1, col2, col3 = st.columns(3)
+    with col2:
+        if st.button("⬅️ Retour", use_container_width=True):
+            st.query_params.clear()  # Clears all query params
+            st.rerun()
+    st.stop()
+
+# **************Title***************
 
 st.title("Trouvez les films que vous aimez")
 
 # ******************Filters***************************
 
-# **************Title***************
 if "prev_title" not in st.session_state:
     st.session_state["prev_title"] = ""
+
+if "prev_genre" not in st.session_state:
+    st.session_state["prev_genre"] = []
+
+# ***********Titre*******************
 
 title = st.text_input("Titre", placeholder="Entrez un titre de film")
 
@@ -33,8 +64,6 @@ if title != st.session_state["prev_title"]:
     st.session_state["prev_title"] = title
 
 # **************Genre***************
-if "prev_genre" not in st.session_state:
-    st.session_state["prev_genre"] = []
 
 genre_series = df["Genres"].str.split(",")
 genre_list = [genre for sublist in genre_series for genre in sublist]
@@ -49,17 +78,14 @@ if genre != st.session_state["prev_genre"]:
     st.session_state["page"] = 1
     st.session_state["prev_genre"] = genre
 
-
-if genre:
-    df = df[df["Genres"].str.contains(genre[0])]
-
 # **************Apply filters***************
 
 if title:
     df = df[df["Title"].str.contains(title, case=False)]
 
 if genre:
-    df = df[df["Genres"].str.contains(genre[0])]
+    genre_pattern = "|".join(genre)
+    df = df[df["Genres"].str.contains(genre_pattern)]
 
 # **************Pagination setup*********************
 
@@ -109,15 +135,8 @@ for i in range(0, len(image_urls), images_per_row):
                 key=f"{df[df['Poster'] == '/'+ image.split('/')[-1]]['tconst'].iloc[0]}",
                 use_container_width=True,
             ):
-                st.session_state["selected_movie"] = (
+                st.query_params["page"] = "detail"
+                st.query_params["tconst"] = (
                     f"{df[df['Poster'] == '/'+ image.split('/')[-1]]['tconst'].iloc[0]}"
                 )
-# ****************Movie details*****************************
-if "selected_movie" in st.session_state:
-    movie = df[df["tconst"] == st.session_state["selected_movie"]].iloc[0]
-
-    modal_html = f"""
-
-        """
-
-    components.html(modal_html, height=600, width=800)
+                st.rerun()
