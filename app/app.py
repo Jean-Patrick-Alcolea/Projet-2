@@ -14,9 +14,10 @@ recom = st.Page(
 
 exp = st.Page(page="views/Explore.py", title="Trouver des films", icon="🎥")
 
+fav = st.Page(page="views/Favoris.py", title="Vos films favoris", icon="❤️")
 
 # ***************Navigation setup***************
 
-pg = st.navigation(pages=[accueil, exp, recom])
+pg = st.navigation(pages=[accueil, exp, recom, fav])
 
 pg.run()

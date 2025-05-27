@@ -23,15 +23,12 @@ if liked_cookie:
 else:
     liked_movies = set()
 
-
-# *********Initialization dataframe************
-
-
 if "df" not in st.session_state:
     df = initialize()
     st.session_state["df"] = df
 else:
     df = st.session_state["df"]
+
 
 # ****************Movie details*****************************
 
@@ -70,8 +67,13 @@ if query_params.get("page") == "detail":
 
 # **************Title***************
 
-st.title("Trouvez les films que vous aimez")
 
+if liked_movies:
+    df_liked_movies = df[df["tconst"].isin(liked_movies)]
+    st.title("Vos favoris")
+else:
+    st.title("Vous n'avez pas encore de favoris")
+    st.stop()
 # ******************Filters***************************
 
 if "prev_title" not in st.session_state:
@@ -94,7 +96,7 @@ if search != st.session_state["prev_title"]:
 
 # **************Genre***************
 
-genre_series = df["Genres"].str.split(",")
+genre_series = df_liked_movies["Genres"].str.split(",")
 genre_list = [genre for sublist in genre_series for genre in sublist]
 genre_list = list(filter(lambda x: x not in ["\\N", "Adult"], genre_list))
 genre_list = pd.Series(genre_list)
@@ -113,20 +115,22 @@ if genre != st.session_state["prev_genre"]:
 # **************Apply filters***************
 
 if search:
-    df = df[
-        (df["Title"].str.contains(search, case=False))
-        | (df["Actors"].str.contains(search, case=False))
+    df_liked_movies = df_liked_movies[
+        (df_liked_movies["Title"].str.contains(search, case=False))
+        | (df_liked_movies["Actors"].str.contains(search, case=False))
     ]
 
 if genre:
     genre_pattern = "|".join(genre)
-    df = df[df["Genres"].str.contains(genre_pattern)]
+    df_liked_movies = df_liked_movies[
+        df_liked_movies["Genres"].str.contains(genre_pattern)
+    ]
 
 # **************Pagination setup*********************
 
 items_per_page = 30
 
-total_pages = (len(df) - 1) // items_per_page + 1
+total_pages = (len(df_liked_movies) - 1) // items_per_page + 1
 
 if "page" not in st.session_state:
     st.session_state["page"] = 1
@@ -154,7 +158,7 @@ with col3:
 
 start_idx = (st.session_state.page - 1) * items_per_page
 end_idx = start_idx + items_per_page
-current_page_images = df.iloc[start_idx:end_idx]["Poster"]
+current_page_images = df_liked_movies.iloc[start_idx:end_idx]["Poster"]
 images_per_row = 5
 # todo:  verifier si il'y a d'image ou pas
 image_urls = [
@@ -167,12 +171,12 @@ for i in range(0, len(image_urls), images_per_row):
         with cols[idx]:
             st.image(image)
             if st.button(
-                f"{df[df['Poster'] == '/'+ image.split('/')[-1]]['Title'].iloc[0]}",
-                key=f"{df[df['Poster'] == '/'+ image.split('/')[-1]]['tconst'].iloc[0]}",
+                f"{df_liked_movies[df_liked_movies['Poster'] == '/'+ image.split('/')[-1]]['Title'].iloc[0]}",
+                key=f"{df_liked_movies[df_liked_movies['Poster'] == '/'+ image.split('/')[-1]]['tconst'].iloc[0]}",
                 use_container_width=True,
             ):
                 st.query_params["page"] = "detail"
                 st.query_params["tconst"] = (
-                    f"{df[df['Poster'] == '/'+ image.split('/')[-1]]['tconst'].iloc[0]}"
+                    f"{df_liked_movies[df_liked_movies['Poster'] == '/'+ image.split('/')[-1]]['tconst'].iloc[0]}"
                 )
                 st.rerun()
