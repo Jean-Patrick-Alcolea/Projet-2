@@ -1,3 +1,4 @@
 .venv
 tmdb_full.csv
 database.duckdb
+app_df.gzip
