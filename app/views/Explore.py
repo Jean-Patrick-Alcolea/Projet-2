@@ -39,7 +39,7 @@ if query_params.get("page") == "detail":
     col1, col2, col3 = st.columns(3)
     with col2:
         if st.button("⬅️ Retour", use_container_width=True):
-            st.query_params.clear()  # Clears all query params
+            st.query_params.clear()
             st.rerun()
     st.stop()
 
@@ -57,11 +57,15 @@ if "prev_genre" not in st.session_state:
 
 # ***********Titre*******************
 
-title = st.text_input("Titre", placeholder="Entrez un titre de film")
+search = st.text_input(
+    "Titre",
+    placeholder="Indiquez un titre de film ou le nom d'un acteur",
+    label_visibility="hidden",
+)
 
-if title != st.session_state["prev_title"]:
+if search != st.session_state["prev_title"]:
     st.session_state["page"] = 1
-    st.session_state["prev_title"] = title
+    st.session_state["prev_title"] = search
 
 # **************Genre***************
 
@@ -71,7 +75,10 @@ genre_list = list(filter(lambda x: x not in ["\\N", "Adult"], genre_list))
 genre_list = pd.Series(genre_list)
 
 genre = st.multiselect(
-    "Genre", options=genre_list.unique(), placeholder="Choisissez un genre"
+    "Genre",
+    options=genre_list.unique(),
+    placeholder="Choisissez un genre",
+    label_visibility="hidden",
 )
 
 if genre != st.session_state["prev_genre"]:
@@ -80,8 +87,11 @@ if genre != st.session_state["prev_genre"]:
 
 # **************Apply filters***************
 
-if title:
-    df = df[df["Title"].str.contains(title, case=False)]
+if search:
+    df = df[
+        (df["Title"].str.contains(search, case=False))
+        | (df["Actors"].str.contains(search, case=False))
+    ]
 
 if genre:
     genre_pattern = "|".join(genre)
@@ -121,6 +131,7 @@ start_idx = (st.session_state.page - 1) * items_per_page
 end_idx = start_idx + items_per_page
 current_page_images = df.iloc[start_idx:end_idx]["Poster"]
 images_per_row = 5
+# todo:  verifier si il'y a d'image ou pas
 image_urls = [
     f"https://image.tmdb.org/t/p/w185/{image}" for image in current_page_images
 ]
