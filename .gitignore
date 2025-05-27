@@ -1,4 +1,5 @@
 .venv
 tmdb_full.csv
 database.duckdb
+app_df.gzip
 .DS_Store
