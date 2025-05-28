@@ -19,9 +19,12 @@ cookie_manager = CookieController()
 
 liked_cookie = cookie_manager.get("liked_movies")
 if liked_cookie:
-    liked_movies = json.loads(liked_cookie)
+    if isinstance(liked_cookie, str):
+        liked_movies = [liked_cookie]
+    else:
+        liked_movies = liked_cookie
 else:
-    liked_movies = set()
+    liked_movies = []
 
 
 # *********Initialization dataframe************
@@ -36,6 +39,7 @@ else:
 # ****************Movie details*****************************
 
 if query_params.get("page") == "detail":
+    cookie_manager.set("liked_movies", liked_movies)
     tconst = query_params.get("tconst")
     info_film = df[df["tconst"] == tconst]
     col1, col2 = st.columns(2)
@@ -45,13 +49,10 @@ if query_params.get("page") == "detail":
         liked = tconst in liked_movies
         like_text = "Eliminer des favoris 💔" if liked else "Ajouter à mes favoris ❤️"
         if st.button(like_text, use_container_width=True):
-            liked_movies = set(liked_movies)
             if liked:
                 liked_movies.remove(tconst)
             else:
-                liked_movies.add(tconst)
-            liked_movies = list(liked_movies)
-            cookie_manager.set("liked_movies", json.dumps(liked_movies))
+                liked_movies.append(tconst)
             st.rerun()
     with col2:
         st.markdown(f"**Titre :** {info_film['Title'].iloc[0]}")
@@ -119,8 +120,8 @@ if search:
     ]
 
 if genre:
-    genre_pattern = "|".join(genre)
-    df = df[df["Genres"].str.contains(genre_pattern)]
+    for g in genre:
+        df = df[df["Genres"].str.contains(g, case=False)]
 
 # **************Pagination setup*********************
 

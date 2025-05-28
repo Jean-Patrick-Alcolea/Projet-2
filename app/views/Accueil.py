@@ -20,9 +20,12 @@ cookie_manager = CookieController()
 
 liked_cookie = cookie_manager.get("liked_movies")
 if liked_cookie:
-    liked_movies = json.loads(liked_cookie)
+    if isinstance(liked_cookie, str):
+        liked_movies = [liked_cookie]
+    else:
+        liked_movies = liked_cookie
 else:
-    liked_movies = set()
+    liked_movies = []
 
 if "df" not in st.session_state:
     df = initialize()
