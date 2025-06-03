@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
 from streamlit_cookies_controller import CookieController
-import json
+import joblib
 
 
 st.title("Cinema Sénéchal")
@@ -13,7 +13,7 @@ query_params = st.query_params
 
 
 def initialize():
-    return pd.read_parquet("data/app_df.gzip")
+    return pd.read_parquet("data/df_similar.gzip")
 
 
 cookie_manager = CookieController()
@@ -32,5 +32,9 @@ if "df" not in st.session_state:
     st.session_state["df"] = df
 else:
     df = st.session_state["df"]
+
+current_view = "Accueil"
+
+page_key = f"{current_view}_page"
 
 st.dataframe(df)
