@@ -3,6 +3,7 @@
 import streamlit as st
 import pandas as pd
 from streamlit_cookies_controller import CookieController
+from streamlit_scroll_to_top import scroll_to_here
 
 # **************Initialization cookies et fonctions ************************
 
@@ -29,6 +30,10 @@ if "df" not in st.session_state:
     st.session_state["df"] = df
 else:
     df = st.session_state["df"]
+
+if st.session_state.get("scroll_to_header", False) is True:
+    scroll_to_here(0, key="top")
+    st.session_state["scroll_to_header"] = False
 
 current_view = "Favoris"
 
@@ -67,6 +72,7 @@ if query_params.get("page") == "detail":
     with col2:
         if st.button("⬅️ Retour", use_container_width=True):
             st.query_params.clear()
+            st.session_state["scroll_to_header"] = True
             st.rerun()
     st.header("Films similaires", divider="gray")
     images_per_row = 5
@@ -79,6 +85,7 @@ if query_params.get("page") == "detail":
                 st.image(f"https://image.tmdb.org/t/p/w185/{row.Poster}")
                 if st.button(row.Title, key=row.tconst, use_container_width=True):
                     st.query_params.update({"page": "detail", "tconst": row.tconst})
+                    st.session_state["scroll_to_header"] = True
                     st.rerun()
     st.stop()
 
@@ -199,4 +206,5 @@ for i in range(0, len(page_df), images_per_row):
             st.image(f"https://image.tmdb.org/t/p/w185/{row.Poster}")
             if st.button(row.Title, key=row.tconst, use_container_width=True):
                 st.query_params.update({"page": "detail", "tconst": row.tconst})
+                st.session_state["scroll_to_header"] = True
                 st.rerun()
