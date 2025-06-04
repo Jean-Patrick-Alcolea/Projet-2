@@ -47,7 +47,7 @@ if query_params.get("page") == "detail":
     tconst = query_params.get("tconst")
     info_film = df[df["tconst"] == tconst].reset_index().squeeze()
 
-    recomended_df = df.loc[info_film["similar_films"]]
+    recomended_df = df.iloc[info_film["similar_films"]]
     col1, col2 = st.columns(2)
     with col1:
         st.image(f"https://image.tmdb.org/t/p/w342/{info_film['Poster']}")

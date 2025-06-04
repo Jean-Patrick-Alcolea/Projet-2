@@ -47,7 +47,7 @@ if query_params.get("page") == "detail":
     cookie_manager.set("liked_movies", liked_movies)
     tconst = query_params.get("tconst")
     info_film = df[df["tconst"] == tconst].reset_index().squeeze()
-    recomended_df = df.loc[info_film["similar_films"]]
+    recomended_df = df.iloc[info_film["similar_films"]]
     col1, col2 = st.columns(2)
     with col1:
         st.image(f"https://image.tmdb.org/t/p/w342/{info_film['Poster']}")
@@ -104,7 +104,7 @@ similar_ids = set(
 )
 
 
-rec_df = df.loc[list(similar_ids)]
+rec_df = df.iloc[list(similar_ids)]
 rec_df = rec_df[~rec_df["tconst"].isin(liked_movies)]
 
 
