@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
 from streamlit_cookies_controller import CookieController
-import joblib
 
 
-st.title("Cinema Sénéchal")
+st.title("Cinéma Sénéchal")
 
 # **************Initialization cookies et fonctions ************************
 
@@ -37,4 +35,31 @@ current_view = "Accueil"
 
 page_key = f"{current_view}_page"
 
-st.dataframe(df)
+
+st.markdown(
+    """
+Cette application vous permet de découvrir des films similaires à ceux que vous aimez, d’explorer par titre ou par genre, et de sauvegarder vos coups de cœur.
+
+### 🧭 Comment utiliser l'application :
+
+#### 🎥 Trouver des films
+- Recherchez un film ou un acteur dans la barre de recherche.
+- Filtrez les films par **genre**.
+- Cliquez sur un titre pour voir plus de **détails** et obtenir des **recommandations personnalisées** ainsi que les **"Ajouter à vos favoris ❤️"**.
+
+#### 🎬 Recommandations des films
+- Allez dans l’onglet **Recommandations** pour découvrir des suggestions basées sur vos films préférés.
+            
+#### ❤️ Vos films favoris
+- Consultez tous les films que vous avez aimés.
+
+
+
+---
+
+### 🍪 Astuce :
+Vos favoris sont enregistrés dans votre navigateur à l’aide de cookies. Ils seront disponibles à votre prochaine visite sur ce navigateur.
+
+---
+"""
+)
