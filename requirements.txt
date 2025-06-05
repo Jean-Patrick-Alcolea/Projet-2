@@ -112,6 +112,7 @@ soupsieve==2.7
 stack-data==0.6.3
 statsmodels==0.14.4
 streamlit==1.45.1
+streamlit-cookies-controller==0.0.4
 tenacity==9.1.2
 terminado==0.18.1
 threadpoolctl==3.6.0
