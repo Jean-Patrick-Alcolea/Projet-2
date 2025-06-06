@@ -11,7 +11,7 @@ query_params = st.query_params
 
 
 def initialize():
-    return pd.read_parquet("data/st_df.gzip")
+    return pd.read_parquet("data/movie_df.gzip")
 
 
 cookie_manager = CookieController()
