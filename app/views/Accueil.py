@@ -3,6 +3,9 @@ import pandas as pd
 from streamlit_cookies_controller import CookieController
 
 
+col1, col2, col3 = st.columns(3)
+with col2:
+    st.image("app/img/logo.png", width=300)
 st.title("Creuse Toujours")
 
 # **************Initialization cookies et fonctions ************************
